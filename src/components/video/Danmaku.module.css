@@ -1,0 +1,22 @@
+.container {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    overflow: hidden;
+    z-index: 10;
+}
+
+.danmakuItem {
+    position: absolute;
+    white-space: nowrap;
+    font-size: 20px;
+    font-weight: 600;
+    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
+    user-select: none;
+    will-change: transform;
+}
+
+/* Animation class will be added dynamically or handled via JS style */
