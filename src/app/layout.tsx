@@ -1,14 +1,11 @@
 import type { Metadata } from 'next'
 import '@/styles/globals.css'
-import type { Metadata } from 'next'
-import '@/styles/globals.css'
+import Header from '@/components/layout/Header';
 
 export const metadata: Metadata = {
-    title: 'AnFun - Bilibili Clone',
+    title: 'AbFun - Bilibili Clone',
     description: 'A premium video streaming platform',
 }
-
-import Header from '@/components/layout/Header';
 
 export default function RootLayout({
     children,

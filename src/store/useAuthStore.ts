@@ -3,9 +3,9 @@ import { persist } from 'zustand/middleware';
 
 interface User {
     id: number;
-    username: string;
-    email: string;
-    avatar_url?: string;
+    nickname: string;
+    avatar: string;
+    email?: string;
 }
 
 interface AuthState {
@@ -14,6 +14,7 @@ interface AuthState {
     isAuthenticated: boolean;
     login: (user: User, token: string) => void;
     logout: () => void;
+    setUser: (user: User | null) => void;
     updateUser: (user: Partial<User>) => void;
 }
 
@@ -31,6 +32,7 @@ export const useAuthStore = create<AuthState>()(
                 localStorage.removeItem('token');
                 set({ user: null, token: null, isAuthenticated: false });
             },
+            setUser: (user) => set({ user }),
             updateUser: (updatedUser) =>
                 set((state) => ({
                     user: state.user ? { ...state.user, ...updatedUser } : null,

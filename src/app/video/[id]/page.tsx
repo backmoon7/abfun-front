@@ -3,13 +3,14 @@
 import { useEffect, useState } from 'react';
 import { useParams } from 'next/navigation';
 import { ThumbsUp, Star, Share2 } from 'lucide-react';
-import { api } from '@/lib/api';
+import { videoApi, interactionApi } from '@/lib/api';
 import VideoPlayer from '@/components/video/VideoPlayer';
+import CommentList from '@/components/video/CommentList';
 import styles from './VideoDetail.module.css';
 
 export default function VideoDetailPage() {
     const params = useParams();
-    const id = params.id;
+    const id = params.id as string;
     const [video, setVideo] = useState<any>(null);
     const [loading, setLoading] = useState(true);
     const [liked, setLiked] = useState(false);
@@ -17,25 +18,10 @@ export default function VideoDetailPage() {
     useEffect(() => {
         const fetchVideo = async () => {
             try {
-                // Mock data for now if API fails or is not ready
-                // const res = await api.get(`/videos/${id}`);
-                // setVideo(res.data.video);
-
-                // Simulating API response for demo
-                setVideo({
-                    id: Number(id),
-                    title: 'Building a Bilibili Clone with Next.js',
-                    description: 'In this video, we will learn how to build a modern video streaming platform using Next.js 14, TypeScript, and Go.',
-                    url: 'http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4', // Test video
-                    view_count: 12034,
-                    like_count: 856,
-                    created_at: new Date().toISOString(),
-                    user: {
-                        id: 1,
-                        username: 'TechMaster',
-                        avatar_url: 'https://api.dicebear.com/7.x/avataaars/svg?seed=TechMaster'
-                    }
-                });
+                const res = await videoApi.getDetail(id);
+                setVideo(res.data);
+                // Check if liked status is available in response, otherwise default to false
+                // setLiked(res.data.is_liked); 
             } catch (error) {
                 console.error('Failed to fetch video:', error);
             } finally {
@@ -50,11 +36,12 @@ export default function VideoDetailPage() {
         // Optimistic update
         setLiked(!liked);
         try {
-            if (liked) {
-                await api.delete('/interaction/like', { data: { video_id: Number(id) } });
-            } else {
-                await api.post('/interaction/like', { video_id: Number(id) });
-            }
+            await interactionApi.likeVideo(id);
+            // Update like count in video object
+            setVideo((prev: any) => ({
+                ...prev,
+                like_count: liked ? prev.like_count - 1 : prev.like_count + 1
+            }));
         } catch (error) {
             console.error('Like failed', error);
             setLiked(!liked); // Revert
@@ -67,12 +54,12 @@ export default function VideoDetailPage() {
     return (
         <div className={styles.container}>
             <div className={styles.mainContent}>
-                <VideoPlayer src={video.url} videoId={video.id} />
+                <VideoPlayer src={video.video_url} poster={video.cover_url} />
 
                 <div className={styles.videoInfo}>
                     <h1 className={styles.title}>{video.title}</h1>
                     <div className={styles.meta}>
-                        <span>{video.view_count.toLocaleString()} views</span>
+                        <span>{video.view_count?.toLocaleString() || 0} views</span>
                         <span>{new Date(video.created_at).toLocaleDateString()}</span>
                     </div>
 
@@ -82,7 +69,7 @@ export default function VideoDetailPage() {
                             onClick={handleLike}
                         >
                             <ThumbsUp size={24} />
-                            <span>{liked ? video.like_count + 1 : video.like_count}</span>
+                            <span>{video.like_count || 0}</span>
                         </button>
                         <button className={styles.actionBtn}>
                             <Star size={24} />
@@ -98,14 +85,16 @@ export default function VideoDetailPage() {
                         {video.description}
                     </div>
                 </div>
+
+                <CommentList videoId={id} />
             </div>
 
             <div className={styles.sidebar}>
                 <div className={styles.authorCard}>
-                    <img src={video.user.avatar_url} alt={video.user.username} className={styles.authorAvatar} />
+                    <img src={video.author?.avatar || '/default-avatar.png'} alt={video.author?.nickname} className={styles.authorAvatar} />
                     <div className={styles.authorInfo}>
-                        <div className={styles.authorName}>{video.user.username}</div>
-                        <div style={{ fontSize: 12, color: '#999' }}>100k followers</div>
+                        <div className={styles.authorName}>{video.author?.nickname || 'Unknown'}</div>
+                        <div style={{ fontSize: 12, color: '#999' }}>Author</div>
                     </div>
                     <button className={styles.followBtn}>+ Follow</button>
                 </div>

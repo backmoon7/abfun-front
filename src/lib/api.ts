@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL || 'https://abfun.me';
+const API_URL = process.env.NEXT_PUBLIC_API_URL || 'https://api.abfun.me';
 
 export const api = axios.create({
     baseURL: `${API_URL}/api/v1`,
@@ -39,3 +39,34 @@ api.interceptors.response.use(
         return Promise.reject(error);
     }
 );
+
+// --- API Endpoints ---
+
+// Auth & User
+export const authApi = {
+    login: (data: any) => api.post('/auth/login', data),
+    register: (data: any) => api.post('/auth/register', data),
+    getMe: () => api.get('/auth/me'),
+    updateProfile: (data: { nickname?: string; avatar?: string }) => api.put('/auth/me', data),
+};
+
+// Videos
+export const videoApi = {
+    getFeed: () => api.get('/videos/feed'),
+    getDetail: (id: string) => api.get(`/videos/${id}`),
+    upload: (formData: FormData) => api.post('/videos', formData, {
+        headers: { 'Content-Type': 'multipart/form-data' },
+    }),
+};
+
+// Comments
+export const commentApi = {
+    list: (videoId: string) => api.get(`/videos/${videoId}/comments`),
+    create: (videoId: string, content: string) => api.post(`/videos/${videoId}/comments`, { content }),
+    delete: (commentId: number) => api.delete(`/comments/${commentId}`),
+};
+
+// Interaction
+export const interactionApi = {
+    likeVideo: (videoId: string) => api.post(`/videos/${videoId}/like`),
+};
