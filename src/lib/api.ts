@@ -4,7 +4,7 @@ const API_URL = process.env.NEXT_PUBLIC_API_URL || 'https://api.abfun.me';
 
 export const api = axios.create({
     baseURL: `${API_URL}/api/v1`,
-    timeout: 10000,
+    timeout: 300000,
     headers: {
         'Content-Type': 'application/json',
     },

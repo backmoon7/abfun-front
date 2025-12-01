@@ -16,44 +16,23 @@ export default function UserProfilePage() {
     useEffect(() => {
         const fetchData = async () => {
             try {
-                // Mock data for now
-                // const userRes = await api.get(`/user/profile/${id}`);
-                // setUser(userRes.data.user);
+                // Fetch user info using the users API endpoint
+                const userRes = await api.get(`/user/users?ids=${id}`);
+                const userData = userRes.data.data?.[0]; // Backend returns {data: [user]}
+                
+                if (userData) {
+                    setUser({
+                        id: userData.ID,
+                        username: userData.Nickname || 'User',
+                        email: userData.Email,
+                        avatar_url: userData.Avatar || `https://api.dicebear.com/7.x/avataaars/svg?seed=${userData.Nickname}`,
+                        created_at: userData.CreatedAt
+                    });
+                }
 
-                setUser({
-                    id: Number(id),
-                    username: 'TechMaster',
-                    email: 'tech@example.com',
-                    avatar_url: `https://api.dicebear.com/7.x/avataaars/svg?seed=TechMaster`,
-                    created_at: new Date().toISOString()
-                });
-
-                // const videosRes = await api.get(`/videos/user/${id}`);
-                // setVideos(videosRes.data.videos);
-                setVideos([
-                    {
-                        id: 1,
-                        title: 'Building a Bilibili Clone with Next.js',
-                        description: '...',
-                        url: '...',
-                        user_id: 1,
-                        view_count: 12034,
-                        like_count: 856,
-                        created_at: new Date().toISOString(),
-                        thumbnail: 'https://picsum.photos/seed/1/640/360'
-                    },
-                    {
-                        id: 2,
-                        title: 'Advanced Go Concurrency Patterns',
-                        description: '...',
-                        url: '...',
-                        user_id: 1,
-                        view_count: 5400,
-                        like_count: 320,
-                        created_at: new Date().toISOString(),
-                        thumbnail: 'https://picsum.photos/seed/2/640/360'
-                    }
-                ]);
+                // TODO: Implement backend endpoint for user's videos
+                // For now, keep videos empty until backend endpoint is ready
+                setVideos([]);
 
             } catch (error) {
                 console.error('Failed to fetch profile:', error);
