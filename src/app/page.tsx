@@ -12,7 +12,7 @@ export default function Home() {
         const fetchVideos = async () => {
             try {
                 const res = await api.get('/videos/feed');
-                setVideos(res.data.videos || []);
+                setVideos(res.data || []);
             } catch (error) {
                 console.error('Failed to fetch videos:', error);
             } finally {

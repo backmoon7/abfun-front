@@ -3,12 +3,12 @@
 import { useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { api } from '@/lib/api';
+import { authApi } from '@/lib/api';
 import styles from '../Auth.module.css';
 
 export default function RegisterPage() {
     const router = useRouter();
-    const [formData, setFormData] = useState({ username: '', email: '', password: '' });
+    const [formData, setFormData] = useState({ nickname: '', email: '', password: '' });
     const [error, setError] = useState('');
     const [loading, setLoading] = useState(false);
 
@@ -18,7 +18,7 @@ export default function RegisterPage() {
         setLoading(true);
 
         try {
-            await api.post('/user/register', formData);
+            await authApi.register(formData);
             // After registration, redirect to login
             router.push('/login?registered=true');
         } catch (err: any) {
@@ -37,13 +37,13 @@ export default function RegisterPage() {
 
                 <form onSubmit={handleSubmit} className={styles.form}>
                     <div className={styles.inputGroup}>
-                        <label className={styles.label}>Username</label>
+                        <label className={styles.label}>Nickname</label>
                         <input
                             type="text"
                             required
                             className={styles.input}
-                            value={formData.username}
-                            onChange={(e) => setFormData({ ...formData, username: e.target.value })}
+                            value={formData.nickname}
+                            onChange={(e) => setFormData({ ...formData, nickname: e.target.value })}
                         />
                     </div>
 

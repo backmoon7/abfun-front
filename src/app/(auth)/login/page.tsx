@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { api } from '@/lib/api';
+import { authApi } from '@/lib/api';
 import { useAuthStore } from '@/store/useAuthStore';
 import styles from '../Auth.module.css';
 
@@ -20,7 +20,7 @@ export default function LoginPage() {
         setLoading(true);
 
         try {
-            const res = await api.post('/user/login', formData);
+            const res = await authApi.login(formData);
             const { user, token } = res.data;
 
             login(user, token);

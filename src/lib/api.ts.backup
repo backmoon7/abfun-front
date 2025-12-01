@@ -42,14 +42,6 @@ api.interceptors.response.use(
 
 // --- API Endpoints ---
 
-// Authentication
-export const authApi = {
-    login: (data: { email: string; password: string }) => api.post('/user/login', data),
-    register: (data: { email: string; password: string; nickname?: string }) => api.post('/user/register', data),
-    getMe: () => api.get('/user/me'),
-    updateProfile: (data: { nickname?: string; avatar?: string }) => api.put('/user/update', data),
-};
-
 // Videos
 export const videoApi = {
     getFeed: () => api.get('/videos/feed'),
@@ -57,18 +49,16 @@ export const videoApi = {
     upload: (formData: FormData) => api.post('/videos', formData, {
         headers: { 'Content-Type': 'multipart/form-data' },
     }),
-    search: (query: string) => api.get('/search', { params: { q: query } }),
 };
 
 // Comments
 export const commentApi = {
-    list: (videoId: string) => api.get('/interaction/comments', { params: { video_id: videoId } }),
-    create: (videoId: string, content: string) => api.post('/interaction/comments', { video_id: parseInt(videoId), content }),
-    delete: (commentId: number) => api.delete(`/interaction/comments/${commentId}`),
+    list: (videoId: string) => api.get(`/videos/${videoId}/comments`),
+    create: (videoId: string, content: string) => api.post(`/videos/${videoId}/comments`, { content }),
+    delete: (commentId: number) => api.delete(`/comments/${commentId}`),
 };
 
 // Interaction
 export const interactionApi = {
-    likeVideo: (videoId: string) => api.post('/interaction/like', { video_id: parseInt(videoId) }),
-    unlikeVideo: (videoId: string) => api.delete('/interaction/like', { data: { video_id: parseInt(videoId) } }),
+    likeVideo: (videoId: string) => api.post(`/videos/${videoId}/like`),
 };

@@ -2,17 +2,27 @@
 
 import Link from 'next/link';
 import { useState, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
 import { useAuthStore } from '@/store/useAuthStore';
 import styles from './Header.module.css';
 
 export default function Header() {
+    const router = useRouter();
     const { user, isAuthenticated, logout } = useAuthStore();
     const [mounted, setMounted] = useState(false);
+    const [searchQuery, setSearchQuery] = useState('');
 
     // Hydration fix for Zustand persist
     useEffect(() => {
         setMounted(true);
     }, []);
+
+    const handleSearch = (e: React.FormEvent) => {
+        e.preventDefault();
+        if (searchQuery.trim()) {
+            router.push(`/search?q=${encodeURIComponent(searchQuery.trim())}`);
+        }
+    };
 
     if (!mounted) return null;
 
@@ -25,13 +35,15 @@ export default function Header() {
                 </Link>
 
                 {/* Search Bar */}
-                <div className={styles.searchBar}>
+                <form onSubmit={handleSearch} className={styles.searchBar}>
                     <input
                         type="text"
+                        value={searchQuery}
+                        onChange={(e) => setSearchQuery(e.target.value)}
                         placeholder="Search videos..."
                         className={styles.searchInput}
                     />
-                </div>
+                </form>
 
                 {/* Actions */}
                 <div className={styles.actions}>
